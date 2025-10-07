@@ -35,7 +35,7 @@ const Gameboard = (function(){
     }
 
 
-return {getBoard, placeMark, resetBoard  }
+return {getBoard, placeMark, resetBoard, printBoard  }
 }
 )();    
 
@@ -74,7 +74,7 @@ const gameController = (function () {
             let playerOneCounter = 0;
             let playerTwoCounter = 0;
             for (let j = 0; j < dimensions; j++){
-                cell = boardState[i][j];
+            let    cell = boardState[i][j];
                 if(cell ===  players[0].token){
                     playerOneCounter++;
                     playerTwoCounter = 0;
@@ -105,7 +105,7 @@ const gameController = (function () {
             let playerOneCounter = 0;
             let playerTwoCounter = 0;
             for (let j = 0; j < dimensions; j++){
-                cell = boardState[j][i];
+            let     cell = boardState[j][i];
                 if(cell ===  players[0].token){
                     playerOneCounter++;
                     playerTwoCounter = 0;
@@ -189,26 +189,34 @@ const gameController = (function () {
          return( checkRowWin() || checkColumnWin() || checkDiagonalWin()) === true ? true : false;
     }
     const playRound = (row,col) => {
-        console.log(`It's ${activePlayer.name}'s turn`);
         Gameboard.placeMark(row -1, col- 1, activePlayer.token);
         Gameboard.printBoard();
         if (checkForWin() === true){
+            Gameboard.printBoard();
           console.log(`${activePlayer.name} has won the game! \n Let's play again!`);
-            Gameboard.resetBoard();
             switchPlayerTurn();
+        console.log(`It's ${activePlayer.name}'s turn`);
+                            Gameboard.resetBoard();
         }
         else if (turnCounter === 9) 
             {
-                console.log(`It's a tie! \n Let's play again!`);
+                console.log(`It's a tie! \nLet's play again!`);
                 Gameboard.resetBoard();
                 turnCounter  = 1;
                 switchPlayerTurn();
+        console.log(`It's ${activePlayer.name}'s turn`);
+
     }
         else {
             turnCounter += 1;
             switchPlayerTurn();
+        console.log(`It's ${activePlayer.name}'s turn`);
+
         }
     }
-
+    
+    // initialize the game by printing the board and tell who'se turn this is
+    Gameboard.printBoard();
+    console.log(`Let's play tic-tac-toe using the gameController.playRound(row,col) command!  \n It's ${activePlayer.name}'s turn.`);
     return {playRound}
 })();
