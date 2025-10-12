@@ -15,14 +15,14 @@ const Gameboard = (function(){
 
 
 
-    const placeMark = (row, coll, mark) => {
+    const placeMark = (row, coll, mark) => {3
               board[row][coll] = mark;
         }
       
     
 
     const printBoard = () =>{
-        console.log(getBoard());
+        displayController.setMessage(getBoard());
     }
 
     const resetBoard = () => {
@@ -47,6 +47,69 @@ const Player = function(name, token){
         token}
 };
 
+
+
+// createa a display controller model to create the correct structure in html
+const displayController = (function(){
+    const dimensions = 3;
+    const massageBoard =  document.createElement('h2');
+    const boardContainer = document.createElement('div');
+    document.body.appendChild(massageBoard);
+    document.body.appendChild(boardContainer);
+
+    // add a message to the message board
+    const  setMessage = (message) => {
+        massageBoard.textContent = message;
+    };
+
+    // create a board container and 9 divs in a nested for loop
+    for(let i = 0; i < dimensions; i++){
+        for(let j = 0 ; j < dimensions; j++){
+            // create <div class="cell" data-row="1" data-col="2"></div>
+            let cell = document.createElement('div')
+            cell.setAttribute('class', 'cell');
+            cell.setAttribute('data-row', i);
+            cell.setAttribute('data-col', j);
+            boardContainer.appendChild(cell);
+        }
+    }
+
+    boardContainer.addEventListener('click', (e) => {
+        // If the game is over, don't do anything
+         if (gameController.getIsGameOver()) return;
+        // find the closest cell to the clicked elemecnt
+        const cell  = e.target.closest('div.cell');
+        // if the click was not iside a cell do nothing
+        if (! cell) return;
+        else {
+            const row = parseInt(cell.dataset.row,10); 
+            const col = parseInt(cell.dataset.col, 10); 
+            gameController.playRound(row + 1, col + 1);
+        }
+    });
+
+    const updateDisplay = () => {
+        // get the current state of the game board  
+        const boardState = Gameboard.getBoard();
+        const size = 3
+        // Loop through the board array.
+        for(let i =0 ; i < size; i++){
+            for(let j =0; j < size; j++){
+                // string for the specific cell
+                const selector = `.cell[data-row="${i}"][data-col="${j}"]`;
+                // query for the specific element
+                const cell = document.querySelector(selector);
+                cell.textContent = boardState[i][j];
+            }
+        }
+      
+
+        
+    }
+    return {updateDisplay, setMessage}
+
+})();
+
 const gameController = (function () {
     const firstUserName = prompt('Enter the name of the first player');
     const secondUserName = prompt('Enter the name of the second player');
@@ -60,6 +123,9 @@ const gameController = (function () {
     let turnCounter = 1;
 
     let activePlayer = players[0];
+    let isGameOver = false;
+
+    const getIsGameOver = () => {return isGameOver};
 
     const switchPlayerTurn = ()=>{
         activePlayer= activePlayer === players[0] ? players[1] : players[0];
@@ -89,7 +155,7 @@ const gameController = (function () {
             }
             }
             if (playerOneCounter === 3 || playerTwoCounter === 3) {
-                console.log(`${activePlayer.name} has won the game on a row!`);
+                displayController.setMessage(`${activePlayer.name} has won the game on a row!`);
                 return true;
             }
 
@@ -120,7 +186,7 @@ const gameController = (function () {
             }
             }
             if (playerOneCounter === 3 || playerTwoCounter === 3) {
-                console.log(`${activePlayer.name} has won the game on a column!`);
+                displayController.setMessage(`${activePlayer.name} has won the game on a column!`);
                 return true;
             }
 
@@ -152,7 +218,7 @@ const gameController = (function () {
         }
 
         if (playerOneCounter === 3 || playerTwoCounter === 3) {
-                console.log(`${activePlayer.name} has won the game on a diagonal!`);
+                displayController.setMessage(`${activePlayer.name} has won the game on a diagonal!`);
                 return true;
             }
             // now check for an anti diagona;
@@ -177,7 +243,7 @@ const gameController = (function () {
             }
         }
         if (playerOneCounter === 3 || playerTwoCounter === 3) {
-                console.log(`${activePlayer.name} has won the game on a diagonal!`);
+                displayController.setMessage(`${activePlayer.name} has won the game on a diagonal!`);
                 return true;
             }
          // if there is no wiiner
@@ -190,33 +256,34 @@ const gameController = (function () {
     }
     const playRound = (row,col) => {
         Gameboard.placeMark(row -1, col- 1, activePlayer.token);
-        Gameboard.printBoard();
+        displayController.updateDisplay();
         if (checkForWin() === true){
-            Gameboard.printBoard();
-          console.log(`${activePlayer.name} has won the game! \n Let's play again!`);
+            displayController.updateDisplay();
+          displayController.setMessage(`${activePlayer.name} has won the game! \n Let's play again!`);
             switchPlayerTurn();
-        console.log(`It's ${activePlayer.name}'s turn`);
+        displayController.setMessage(`It's ${activePlayer.name}'s turn`);
                             Gameboard.resetBoard();
+                            displayController.updateDisplay();
         }
         else if (turnCounter === 9) 
             {
-                console.log(`It's a tie! \nLet's play again!`);
+                displayController.setMessage(`It's a tie! \nLet's play again!`);
                 Gameboard.resetBoard();
                 turnCounter  = 1;
                 switchPlayerTurn();
-        console.log(`It's ${activePlayer.name}'s turn`);
+        displayController.setMessage(`It's ${activePlayer.name}'s turn`);
 
     }
         else {
             turnCounter += 1;
             switchPlayerTurn();
-        console.log(`It's ${activePlayer.name}'s turn`);
+        displayController.setMessage(`It's ${activePlayer.name}'s turn`);
 
         }
     }
     
     // initialize the game by printing the board and tell who'se turn this is
-    Gameboard.printBoard();
-    console.log(`Let's play tic-tac-toe using the gameController.playRound(row,col) command!  \n It's ${activePlayer.name}'s turn.`);
-    return {playRound}
+    displayController.updateDisplay();
+    displayController.setMessage(`Let's play tic-tac-toe using the gameController.playRound(row,col) command!  \n It's ${activePlayer.name}'s turn.`);
+    return {playRound, getIsGameOver}
 })();
