@@ -1,4 +1,6 @@
 "use strict";
+
+// Gameboard module manages the underlying 3x3 matrix and exposes safe helpers.
 const Gameboard = (function(){
     // private
     const size = 3;
@@ -47,8 +49,7 @@ return {getBoard, placeMark, resetBoard, printBoard  }
 )();    
 
 
-
-
+// Factory for creating players tied to a name + token.
 const Player = function(name, token){
     return {name,
         token}
@@ -56,7 +57,7 @@ const Player = function(name, token){
 
 
 
-// createa a display controller model to create the correct structure in html
+// displayController owns DOM creation + rendering for the board and status text.
 const displayController = (function(){
     const dimensions = 3;
     const massageBoard =  document.createElement('h2');
@@ -65,10 +66,22 @@ const displayController = (function(){
     document.body.appendChild(boardContainer);
     boardContainer.classList.add('board');
 
+    // Wrap action buttons so they can sit side-by-side.
+    const actionContainer = document.createElement('div');
+    actionContainer.classList.add('action-buttons');
+    document.body.appendChild(actionContainer);
+
+    // Primary restart control, always visible once the board renders.
     const restartButton = document.createElement('button');
     restartButton.textContent = 'Restart';
     restartButton.classList.add('restart-button');
-    document.body.appendChild(restartButton);
+    actionContainer.appendChild(restartButton);
+
+    // Rename control stays hidden until a match concludes.
+    const renameButton = document.createElement('button');
+    renameButton.textContent = 'Change Players';
+    renameButton.classList.add('rename-button', 'is-hidden');
+    actionContainer.appendChild(renameButton);
 
     // add a message to the message board
     const  setMessage = (message) => {
@@ -121,15 +134,20 @@ const displayController = (function(){
     }
 
 
-    return {updateDisplay, setMessage}
+    const showRenameButton = () => renameButton.classList.remove('is-hidden');
+    const hideRenameButton = () => renameButton.classList.add('is-hidden');
+
+
+    return {updateDisplay, setMessage, showRenameButton, hideRenameButton, restartButton, renameButton}
 
 })();
 
+// gameController wires user input, win detection, and progression.
 const gameController = (function () {
     const form = document.getElementById('player-form');
     const overlay = document.querySelector('.modal-overlay');
     const firstInput = form ? form.querySelector('#player1') : null;
-    const restartButton = document.querySelector('.restart-button');
+    const {restartButton, renameButton} = displayController;
     const players = [];
 
     let turnCounter = 1;
@@ -137,10 +155,12 @@ const gameController = (function () {
     let activePlayer = null;
     let isGameOver = true;
 
+    // Guard so no turn logic runs until both names are registered.
     const ensurePlayersReady = () => players.length === 2;
 
     const getIsGameOver = () => {return isGameOver};
 
+    // Toggle between the two players; loop if the roster is incomplete.
     const switchPlayerTurn = ()=>{
         if (!ensurePlayersReady()) return;
         activePlayer = activePlayer === players[0] ? players[1] : players[0];
@@ -272,6 +292,7 @@ const gameController = (function () {
     const checkForWin = () => {
          return( checkRowWin() || checkColumnWin() || checkDiagonalWin()) === true ? true : false;
     }
+    // Core turn loop, attempts to place a token and resolves win/tie states.
     const playRound = (row,col) => {
         if (!ensurePlayersReady() || isGameOver) return false;
         const roundResolt= Gameboard.placeMark(row -1, col- 1, activePlayer.token);
@@ -287,13 +308,16 @@ const gameController = (function () {
                 displayController.updateDisplay();
                 displayController.setMessage(`${activePlayer.name} has won the game! \n Let's play again!`);
                 isGameOver = true;
+                displayController.showRenameButton();
                 return // stop the game
             }
             else if (turnCounter === 9) 
                 {
                     displayController.setMessage(`It's a tie! \nLet's play again!`);
                     Gameboard.resetBoard();
+                    displayController.updateDisplay();
                     isGameOver = true;
+                    displayController.showRenameButton();
                     return;
 
         }
@@ -306,9 +330,11 @@ const gameController = (function () {
 
        
     }
+    // Reset everything and spin up a new match with the supplied names.
     const startGame = (playerOneName, playerTwoName) => {
         const nameOne = playerOneName || 'Player 1';
         const nameTwo = playerTwoName || 'Player 2';
+        displayController.hideRenameButton();
         players.length = 0;
         players.push(Player(nameOne, 'X'), Player(nameTwo, 'O'));
         activePlayer = players[0];
@@ -329,6 +355,9 @@ const gameController = (function () {
                 overlay.classList.add('is-hidden');
             }
             form.reset();
+            if (firstInput) {
+                firstInput.blur();
+            }
         });
     }
 
@@ -336,6 +365,7 @@ const gameController = (function () {
         firstInput.focus();
     }
 
+    // Restart keeps the current roster and alternates starting player.
     if (restartButton) {
         restartButton.addEventListener('click', () => {
             if (!ensurePlayersReady()) return;
@@ -345,6 +375,23 @@ const gameController = (function () {
             isGameOver = false;
             switchPlayerTurn();
             displayController.setMessage(`It's ${activePlayer.name}'s turn`);
+            displayController.hideRenameButton();
+        });
+    }
+
+    // Rename reopens the modal so players can submit fresh identities.
+    if (renameButton) {
+        renameButton.addEventListener('click', () => {
+            if (overlay) {
+                overlay.classList.remove('is-hidden');
+            }
+            Gameboard.resetBoard();
+            displayController.updateDisplay();
+            displayController.setMessage(`Update player names to start a new match.`);
+            displayController.hideRenameButton();
+            if (firstInput) {
+                setTimeout(() => firstInput.focus(), 0);
+            }
         });
     }
 

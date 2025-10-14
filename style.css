@@ -6,6 +6,7 @@
 }
 
 /* ---------- Modal Overlay ---------- */
+/* Centers the name capture modal over the board until a match is ready. */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -23,6 +24,7 @@
   visibility: hidden;
 }
 
+/* Styles for the modal card and its inner layout. */
 .modal {
   background: #ffffff;
   border-radius: 16px;
@@ -64,12 +66,14 @@
   box-shadow: 0 0 0 3px rgba(126, 87, 194, 0.15);
 }
 
+/* Keeps the modal submit button full width for better tap targets. */
 .modal button {
   margin-top: 12px;
   width: 100%;
   justify-content: center;
 }
 
+/* Baseline button styling shared by restart + modal buttons. */
 button {
   padding: 12px 28px;
   font-size: 1rem;
@@ -231,7 +235,10 @@ h2::before {
 }
 
 /* ---------- Restart Button ---------- */
-.restart-button {
+/* Cluster both action buttons together beneath the board. */
+.action-buttons {
+  display: flex;
+  gap: 12px;
   margin-top: 25px;
 }
 
@@ -251,6 +258,11 @@ h2::before {
 .restart-button:active {
   transform: translateY(0);
   box-shadow: none;
+}
+
+/* Hide the rename button until the end of a match. */
+.rename-button.is-hidden {
+  display: none;
 }
 
 /* ---------- Footer ---------- */
