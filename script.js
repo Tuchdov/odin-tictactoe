@@ -289,7 +289,7 @@ const gameController = (function () {
     
     // initialize the game by printing the board and tell who'se turn this is
     displayController.updateDisplay();
-    displayController.setMessage(`Let's play tic-tac-toe using the gameController.playRound(row,col) command!  \n It's ${activePlayer.name}'s turn.`);
+    displayController.setMessage(`Let's play tic-tac-toe!  \n It's ${activePlayer.name}'s turn.`);
 
     // create a restart function 
     const restartButton = document.querySelector('button');
