@@ -67,6 +67,7 @@ const displayController = (function(){
 
     const restartButton = document.createElement('button');
     restartButton.textContent = 'Restart';
+    restartButton.classList.add('restart-button');
     document.body.appendChild(restartButton);
 
     // add a message to the message board
@@ -125,28 +126,29 @@ const displayController = (function(){
 })();
 
 const gameController = (function () {
-    const firstUserName = prompt('Enter the name of the first player');
-    const secondUserName = prompt('Enter the name of the second player');
-    const playerOne = Player(firstUserName, 'X');
-    const playerTwo = Player(secondUserName, 'O');
-    const players = [
-        playerOne ,
-        playerTwo
-    ]
+    const form = document.getElementById('player-form');
+    const overlay = document.querySelector('.modal-overlay');
+    const firstInput = form ? form.querySelector('#player1') : null;
+    const restartButton = document.querySelector('.restart-button');
+    const players = [];
 
     let turnCounter = 1;
 
-    let activePlayer = players[0];
-    let isGameOver = false;
+    let activePlayer = null;
+    let isGameOver = true;
+
+    const ensurePlayersReady = () => players.length === 2;
 
     const getIsGameOver = () => {return isGameOver};
 
     const switchPlayerTurn = ()=>{
-        activePlayer= activePlayer === players[0] ? players[1] : players[0];
+        if (!ensurePlayersReady()) return;
+        activePlayer = activePlayer === players[0] ? players[1] : players[0];
     }
 
     // wining conditions
     const  checkRowWin = ()=> {
+        if (!ensurePlayersReady()) return false;
         let boardState = Gameboard.getBoard();
         const dimensions = 3;
 
@@ -178,6 +180,7 @@ const gameController = (function () {
     }
 
     const checkColumnWin = () => {
+        if (!ensurePlayersReady()) return false;
          let boardState = Gameboard.getBoard();
         const dimensions = 3;
 
@@ -209,6 +212,7 @@ const gameController = (function () {
     }
 
     const checkDiagonalWin = () => {
+        if (!ensurePlayersReady()) return false;
         let boardState = Gameboard.getBoard();
         const dimensions = 3;
         let playerOneCounter = 0;
@@ -269,6 +273,7 @@ const gameController = (function () {
          return( checkRowWin() || checkColumnWin() || checkDiagonalWin()) === true ? true : false;
     }
     const playRound = (row,col) => {
+        if (!ensurePlayersReady() || isGameOver) return false;
         const roundResolt= Gameboard.placeMark(row -1, col- 1, activePlayer.token);
         if (roundResolt === false){
             displayController.setMessage("That cell is taken!");
@@ -301,27 +306,47 @@ const gameController = (function () {
 
        
     }
-    
-    // initialize the game by printing the board and tell who'se turn this is
-    displayController.updateDisplay();
-    displayController.setMessage(`Let's play tic-tac-toe!  \n It's ${activePlayer.name}'s turn.`);
-
-    // create a restart function 
-    const restartButton = document.querySelector('button');
-    restartButton.addEventListener('click', () => {
-        turnCounter  = 1;
-        switchPlayerTurn();
-        displayController.setMessage(`It's ${activePlayer.name}'s turn`);
-        // reset all the values of the cells
-        const  cells = document.querySelectorAll('.cell');
-        cells.forEach(cell => {
-        cell.textContent = '';
-        })
+    const startGame = (playerOneName, playerTwoName) => {
+        const nameOne = playerOneName || 'Player 1';
+        const nameTwo = playerTwoName || 'Player 2';
+        players.length = 0;
+        players.push(Player(nameOne, 'X'), Player(nameTwo, 'O'));
+        activePlayer = players[0];
         turnCounter = 1;
         isGameOver = false;
         Gameboard.resetBoard();
-        gameController.updateDisplay();
-        
-    });
+        displayController.updateDisplay();
+        displayController.setMessage(`Let's play tic-tac-toe!  \n It's ${activePlayer.name}'s turn.`);
+    };
+
+    if (form) {
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const playerOneName = form.player1.value.trim();
+            const playerTwoName = form.player2.value.trim();
+            startGame(playerOneName, playerTwoName);
+            if (overlay) {
+                overlay.classList.add('is-hidden');
+            }
+            form.reset();
+        });
+    }
+
+    if (firstInput) {
+        firstInput.focus();
+    }
+
+    if (restartButton) {
+        restartButton.addEventListener('click', () => {
+            if (!ensurePlayersReady()) return;
+            Gameboard.resetBoard();
+            displayController.updateDisplay();
+            turnCounter = 1;
+            isGameOver = false;
+            switchPlayerTurn();
+            displayController.setMessage(`It's ${activePlayer.name}'s turn`);
+        });
+    }
+
     return {playRound, getIsGameOver}
 })();

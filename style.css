@@ -5,6 +5,98 @@
   padding: 0;
 }
 
+/* ---------- Modal Overlay ---------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 20px;
+  z-index: 2000;
+}
+
+.modal-overlay.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.modal {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+  padding: 32px 28px;
+  width: min(420px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-align: center;
+  color: #333;
+}
+
+.modal label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.95rem;
+  color: #666;
+}
+
+.modal input {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #d3d3d3;
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.modal input:focus {
+  border-color: #7e57c2;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(126, 87, 194, 0.15);
+}
+
+.modal button {
+  margin-top: 12px;
+  width: 100%;
+  justify-content: center;
+}
+
+button {
+  padding: 12px 28px;
+  font-size: 1rem;
+  cursor: pointer;
+  background: linear-gradient(135deg, #ffffff, #f2f2f2);
+  border: 1px solid #ccc;
+  border-radius: 30px;
+  color: #333;
+  font-weight: 500;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+button:hover {
+  background: #f8f8f8;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
 /* ---------- Sticky Footer Version ---------- */
 body {
   display: flex;                   /* Enables Flexbox layout for vertical stacking */
@@ -139,36 +231,24 @@ h2::before {
 }
 
 /* ---------- Restart Button ---------- */
-button {
+.restart-button {
   margin-top: 25px;
-  padding: 12px 28px;
-  font-size: 1rem;
-  cursor: pointer;
-  background: linear-gradient(135deg, #ffffff, #f2f2f2);
-  border: 1px solid #ccc;
-  border-radius: 30px;
-  color: #333;
-  font-weight: 500;
-  transition: all 0.25s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
 }
 
-button::before {
+.restart-button::before {
   content: "\f021"; /* Font Awesome restart icon */
   font-family: "Font Awesome 6 Free";
   font-weight: 900;
   font-size: 0.95rem;
 }
 
-button:hover {
+.restart-button:hover {
   background: #f8f8f8;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
 }
 
-button:active {
+.restart-button:active {
   transform: translateY(0);
   box-shadow: none;
 }
