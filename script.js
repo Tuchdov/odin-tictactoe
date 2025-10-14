@@ -15,9 +15,16 @@ const Gameboard = (function(){
 
 
 
-    const placeMark = (row, coll, mark) => {3
+    const placeMark = (row, coll, mark) => {
+             // if the cell is  empty mark the cell
+             if (board[row][coll] === '') {
               board[row][coll] = mark;
+              return true;
         }
+            else{
+                return false;
+            }
+    }
       
     
 
@@ -262,29 +269,37 @@ const gameController = (function () {
          return( checkRowWin() || checkColumnWin() || checkDiagonalWin()) === true ? true : false;
     }
     const playRound = (row,col) => {
-
-        Gameboard.placeMark(row -1, col- 1, activePlayer.token);
-        displayController.updateDisplay();
-
-        if (checkForWin() === true){
+        const roundResolt= Gameboard.placeMark(row -1, col- 1, activePlayer.token);
+        if (roundResolt === false){
+            displayController.setMessage("That cell is taken!");
+            return false
+        }
+        
+            else {
             displayController.updateDisplay();
-            displayController.setMessage(`${activePlayer.name} has won the game! \n Let's play again!`);
-            isGameOver = true;
-            return // stop the game
-        }
-        else if (turnCounter === 9) 
-            {
-                displayController.setMessage(`It's a tie! \nLet's play again!`);
-                Gameboard.resetBoard();
-                isGameOver = true;
-                return;
 
-    }
-        else {
-            turnCounter += 1;
-            switchPlayerTurn();
-        displayController.setMessage(`It's ${activePlayer.name}'s turn`);
+            if (checkForWin() === true){
+                displayController.updateDisplay();
+                displayController.setMessage(`${activePlayer.name} has won the game! \n Let's play again!`);
+                isGameOver = true;
+                return // stop the game
+            }
+            else if (turnCounter === 9) 
+                {
+                    displayController.setMessage(`It's a tie! \nLet's play again!`);
+                    Gameboard.resetBoard();
+                    isGameOver = true;
+                    return;
+
         }
+            else {
+                turnCounter += 1;
+                switchPlayerTurn();
+            displayController.setMessage(`It's ${activePlayer.name}'s turn`);
+            }
+            }
+
+       
     }
     
     // initialize the game by printing the board and tell who'se turn this is
