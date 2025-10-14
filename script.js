@@ -56,6 +56,11 @@ const displayController = (function(){
     const boardContainer = document.createElement('div');
     document.body.appendChild(massageBoard);
     document.body.appendChild(boardContainer);
+    boardContainer.classList.add('board');
+
+    const restartButton = document.createElement('button');
+    restartButton.textContent = 'Restart';
+    document.body.appendChild(restartButton);
 
     // add a message to the message board
     const  setMessage = (message) => {
@@ -106,6 +111,8 @@ const displayController = (function(){
 
         
     }
+
+
     return {updateDisplay, setMessage}
 
 })();
@@ -255,35 +262,51 @@ const gameController = (function () {
          return( checkRowWin() || checkColumnWin() || checkDiagonalWin()) === true ? true : false;
     }
     const playRound = (row,col) => {
+
         Gameboard.placeMark(row -1, col- 1, activePlayer.token);
         displayController.updateDisplay();
+
         if (checkForWin() === true){
             displayController.updateDisplay();
-          displayController.setMessage(`${activePlayer.name} has won the game! \n Let's play again!`);
-            switchPlayerTurn();
-        displayController.setMessage(`It's ${activePlayer.name}'s turn`);
-                            Gameboard.resetBoard();
-                            displayController.updateDisplay();
+            displayController.setMessage(`${activePlayer.name} has won the game! \n Let's play again!`);
+            isGameOver = true;
+            return // stop the game
         }
         else if (turnCounter === 9) 
             {
                 displayController.setMessage(`It's a tie! \nLet's play again!`);
                 Gameboard.resetBoard();
-                turnCounter  = 1;
-                switchPlayerTurn();
-        displayController.setMessage(`It's ${activePlayer.name}'s turn`);
+                isGameOver = true;
+                return;
 
     }
         else {
             turnCounter += 1;
             switchPlayerTurn();
         displayController.setMessage(`It's ${activePlayer.name}'s turn`);
-
         }
     }
     
     // initialize the game by printing the board and tell who'se turn this is
     displayController.updateDisplay();
     displayController.setMessage(`Let's play tic-tac-toe using the gameController.playRound(row,col) command!  \n It's ${activePlayer.name}'s turn.`);
+
+    // create a restart function 
+    const restartButton = document.querySelector('button');
+    restartButton.addEventListener('click', () => {
+        turnCounter  = 1;
+        switchPlayerTurn();
+        displayController.setMessage(`It's ${activePlayer.name}'s turn`);
+        // reset all the values of the cells
+        const  cells = document.querySelectorAll('.cell');
+        cells.forEach(cell => {
+        cell.textContent = '';
+        })
+        turnCounter = 1;
+        isGameOver = false;
+        Gameboard.resetBoard();
+        gameController.updateDisplay();
+        
+    });
     return {playRound, getIsGameOver}
 })();

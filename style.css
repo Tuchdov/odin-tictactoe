@@ -1,0 +1,47 @@
+/* Style the board container as a centered 3x3 grid */
+div {
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: sans-serif;
+  margin-top: 40px;
+}
+
+/* The board container */
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  grid-template-rows: repeat(3, 100px);
+  gap: 5px;
+  margin-top: 20px;
+}
+
+
+/* Each cell of the tic-tac-toe board */
+.cell {
+  border: 2px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  cursor: pointer;
+  user-select: none;
+  width: 100px;
+  height: 100px;
+  transition: background 0.2s ease;
+}
+
+.cell:hover {
+  background: #f0f0f0;
+}
+
+button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+}
