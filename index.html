@@ -3,15 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Tic Tac Toe</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/modern-normalize/1.1.0/modern-normalize.min.css">
     <link href="https://fonts.bunny.net/css?family=poppins:300,400,500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div class="modal-overlay">
+  <div class="modal">
+    <h2>Enter Player Names</h2>
+    <form id="player-form">
+      <label>
+        Player 1:
+        <input type="text" id="player1" name="player1" required />
+      </label>
+      <label>
+        Player 2:
+        <input type="text" id="player2" name="player2" required />
+      </label>
+      <button type="submit">Start Game</button>
+    </form>
+  </div>
+</div>
+
     
-    <script src="script.js" defer></script>
         <footer>
         <div class="footer-content">
             <div class="footer-text">Proudly made by Dov Tuch</div>
@@ -27,5 +43,6 @@
             </div>
         </div>
     </footer>
+    <script src="script.js" defer></script>
 </body>
 </html>
